@@ -20,10 +20,18 @@
     </div>
 
     <div class="input-section">
-        <h2>2. Input Scenarios</h2>
-        <div id="scenarios-section">
-            <!-- Scenarios inputs will be dynamically created here -->
-        </div>
+        <h2>2. Input Scenarios (Matrix Form)</h2>
+        <table id="scenarios-table">
+            <thead>
+                <tr id="criteria-headers">
+                    <th>Scenario</th>
+                    <!-- Criteria headers will be dynamically added here -->
+                </tr>
+            </thead>
+            <tbody id="scenarios-body">
+                <!-- Scenario rows will be dynamically added here -->
+            </tbody>
+        </table>
         <button onclick="addScenario()">Add Scenario</button>
         <button onclick="removeScenario()">Remove Last Scenario</button>
     </div>
@@ -39,7 +47,7 @@
 
     <div class="input-section">
         <h2>4. TOPSIS Calculation</h2>
-        <button onclick="calculateWeightedPerformance()">Calculate Weighted Performance</button>
+        <button onclick="rankScenarios()">Rank Scenarios</button>
         <div id="ranking-results"></div>
     </div>
 
