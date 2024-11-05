@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOPSIS Ranking Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>TOPSIS and AHP-Based Ranking Tool</h1>
+
+    <div class="input-section">
+        <h2>1. Define Criteria</h2>
+        <div id="criteria-section">
+            <!-- Criteria inputs will be dynamically created here -->
+        </div>
+        <button onclick="addCriteria()">Add Criteria</button>
+        <button onclick="removeCriteria()">Remove Last Criteria</button>
+    </div>
+
+    <div class="input-section">
+        <h2>2. Input Scenarios</h2>
+        <div id="scenarios-section">
+            <!-- Scenarios inputs will be dynamically created here -->
+        </div>
+        <button onclick="addScenario()">Add Scenario</button>
+        <button onclick="removeScenario()">Remove Last Scenario</button>
+    </div>
+
+    <div class="input-section">
+        <h2>3. AHP Pairwise Comparison</h2>
+        <p>Use sliders to perform pairwise comparison of criteria:</p>
+        <div id="ahp-comparison">
+            <!-- AHP pairwise sliders will be dynamically created here -->
+        </div>
+        <button onclick="calculateAHPWeights()">Calculate Weights</button>
+    </div>
+
+    <div class="input-section">
+        <h2>4. TOPSIS Calculation</h2>
+        <button onclick="calculateWeightedPerformance()">Calculate Weighted Performance</button>
+        <div id="ranking-results"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
