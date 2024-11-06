@@ -9,27 +9,30 @@ function addCriteria() {
     const criteriaHeaders = document.getElementById("criteria-headers");
     const standardizedHeaders = document.getElementById("standardized-headers");
     const scenariosBody = document.getElementById("scenarios-body");
-    const standardizedBody = document.getElementById("standardized-body");
 
+    // Create input for criteria name
     const nameInput = document.createElement("input");
     nameInput.type = "text";
     nameInput.placeholder = "Enter Criteria Name";
     criteriaNames.push(nameInput);
     criteria.push(nameInput);
 
+    // Add criteria header cells
     const headerCell = document.createElement("th");
     headerCell.appendChild(nameInput);
     criteriaHeaders.appendChild(headerCell);
 
     const standardHeaderCell = document.createElement("th");
-    standardHeaderCell.appendChild(document.createTextNode("Standardized " + nameInput.placeholder));
+    standardHeaderCell.appendChild(document.createTextNode("Standardized"));
     standardizedHeaders.appendChild(standardHeaderCell);
 
+    // Add input cells to each scenario row
     for (let row of scenariosBody.children) {
         const inputCell = document.createElement("td");
         const input = document.createElement("input");
         input.type = "number";
         input.placeholder = "Performance";
+        inputCell.appendChild(input);
         row.appendChild(input);
         scenarios[row.rowIndex - 1].push(input);
     }
@@ -44,11 +47,13 @@ function removeCriteria() {
         const standardizedHeaders = document.getElementById("standardized-headers");
         const scenariosBody = document.getElementById("scenarios-body");
 
+        // Remove last header and criteria input
         criteriaHeaders.removeChild(criteriaHeaders.lastChild);
         standardizedHeaders.removeChild(standardizedHeaders.lastChild);
         criteria.pop();
         criteriaNames.pop();
 
+        // Remove last cell in each scenario row
         for (let row of scenariosBody.children) {
             row.removeChild(row.lastChild);
             scenarios[row.rowIndex - 1].pop();
@@ -61,9 +66,7 @@ function removeCriteria() {
 // Add a new scenario row
 function addScenario() {
     const scenariosBody = document.getElementById("scenarios-body");
-    const standardizedBody = document.getElementById("standardized-body");
     const row = document.createElement("tr");
-    const stdRow = document.createElement("tr");
 
     const nameCell = document.createElement("td");
     const nameInput = document.createElement("input");
@@ -71,10 +74,6 @@ function addScenario() {
     nameInput.placeholder = "Scenario Name";
     nameCell.appendChild(nameInput);
     row.appendChild(nameCell);
-
-    const stdNameCell = document.createElement("td");
-    stdNameCell.innerText = nameInput.placeholder;
-    stdRow.appendChild(stdNameCell);
 
     const scenarioData = [nameInput];
 
@@ -86,24 +85,17 @@ function addScenario() {
         inputCell.appendChild(input);
         row.appendChild(inputCell);
         scenarioData.push(input);
-
-        const stdCell = document.createElement("td");
-        stdCell.innerText = "-";
-        stdRow.appendChild(stdCell);
     });
 
     scenarios.push(scenarioData);
     scenariosBody.appendChild(row);
-    standardizedBody.appendChild(stdRow);
 }
 
 // Remove last scenario row
 function removeScenario() {
     if (scenarios.length > 0) {
         const scenariosBody = document.getElementById("scenarios-body");
-        const standardizedBody = document.getElementById("standardized-body");
         scenariosBody.removeChild(scenariosBody.lastChild);
-        standardizedBody.removeChild(standardizedBody.lastChild);
         scenarios.pop();
     }
 }
@@ -111,7 +103,7 @@ function removeScenario() {
 // Update the AHP matrix for pairwise comparisons
 function updateAHPMatrix() {
     const ahpSection = document.getElementById("ahp-comparison");
-    ahpSection.innerHTML = ""; 
+    ahpSection.innerHTML = ""; // Clear existing sliders
 
     ahpMatrix = Array(criteria.length).fill().map(() => Array(criteria.length).fill(1));
 
@@ -130,11 +122,15 @@ function updateAHPMatrix() {
     }
 }
 
+// Update AHP matrix value based on slider input
 function updateAHPValue(i, j, value) {
-    ahpMatrix[i][j] = parseInt(value);
-    ahpMatrix[j][i] = 1 / parseInt(value);
+    if (ahpMatrix[i] && ahpMatrix[j]) {
+        ahpMatrix[i][j] = parseInt(value);
+        ahpMatrix[j][i] = 1 / parseInt(value);
+    }
 }
 
+// Calculate AHP weights and display them
 function calculateAHPWeights() {
     let sum = ahpMatrix.map(row => row.reduce((a, b) => a + b, 0));
     let normalizedMatrix = ahpMatrix.map((row, i) =>
@@ -149,6 +145,7 @@ function calculateAHPWeights() {
     return weights;
 }
 
+// Standardize performance values across all criteria
 function standardizePerformance(performanceMatrix) {
     const means = performanceMatrix[0].map((_, j) =>
         performanceMatrix.reduce((sum, scenario) => sum + scenario[j], 0) / performanceMatrix.length
@@ -165,17 +162,14 @@ function standardizePerformance(performanceMatrix) {
     );
 }
 
+// Rank scenarios using TOPSIS method
 function rankScenarios() {
     const weights = calculateAHPWeights();
     const performanceMatrix = scenarios.map(scenario =>
         scenario.slice(1).map(input => parseFloat(input.value) || 0)
     );
 
-    const minValues = performanceMatrix[0].map((_, j) => Math.min(...performanceMatrix.map(row => row[j])));
-    const maxValues = performanceMatrix[0].map((_, j) => Math.max(...performanceMatrix.map(row => row[j])));
-
-    document.getElementById("min-max-values").innerHTML = `<h3>Criteria Min/Max:</h3><p>${criteriaNames.map((c, i) => `${c.value || `Criteria ${i + 1}`}: Min = ${minValues[i]}, Max = ${maxValues[i]}`).join('<br>')}</p>`;
-
+    // Standardize the performance matrix
     const standardizedMatrix = standardizePerformance(performanceMatrix);
     const standardizedBody = document.getElementById("standardized-body");
     standardizedBody.innerHTML = "";
