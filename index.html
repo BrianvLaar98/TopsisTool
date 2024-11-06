@@ -4,17 +4,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOPSIS Ranking Tool</title>
+    <title>TOPSIS and AHP Tool</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>TOPSIS and AHP-Based Ranking Tool</h1>
+    <h1>TOPSIS & AHP-Based Ranking Tool</h1>
 
     <div class="input-section">
         <h2>1. Define Criteria</h2>
-        <div id="criteria-section">
-            <!-- Criteria inputs will be dynamically created here -->
-        </div>
+        <div id="criteria-section"></div>
         <button onclick="addCriteria()">Add Criteria</button>
         <button onclick="removeCriteria()">Remove Last Criteria</button>
     </div>
@@ -25,12 +23,9 @@
             <thead>
                 <tr id="criteria-headers">
                     <th>Scenario</th>
-                    <!-- Criteria headers will be dynamically added here -->
                 </tr>
             </thead>
-            <tbody id="scenarios-body">
-                <!-- Scenario rows will be dynamically added here -->
-            </tbody>
+            <tbody id="scenarios-body"></tbody>
         </table>
         <button onclick="addScenario()">Add Scenario</button>
         <button onclick="removeScenario()">Remove Last Scenario</button>
@@ -38,11 +33,17 @@
 
     <div class="input-section">
         <h2>3. AHP Pairwise Comparison</h2>
-        <p>Use sliders to perform pairwise comparison of criteria:</p>
-        <div id="ahp-comparison">
-            <!-- AHP pairwise sliders will be dynamically created here -->
-        </div>
+        <div id="ahp-comparison"></div>
         <button onclick="calculateAHPWeights()">Calculate Weights</button>
+        <div id="ahp-legend">
+            <h3>AHP 9-Point Scale Legend</h3>
+            <p>1: Equal importance</p>
+            <p>3: Moderate importance of one over another</p>
+            <p>5: Strong importance</p>
+            <p>7: Very strong importance</p>
+            <p>9: Extreme importance</p>
+            <p>2, 4, 6, 8: Intermediate values</p>
+        </div>
     </div>
 
     <div class="input-section">
