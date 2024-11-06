@@ -43,6 +43,16 @@ th, td {
     text-align: center;
 }
 
+#ahp-comparison {
+    margin-top: 20px;
+}
+
+#ahp-legend {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #555;
+}
+
 #ranking-results {
     margin-top: 20px;
 }
