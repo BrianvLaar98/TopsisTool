@@ -60,6 +60,12 @@ th, td {
     color: #555;
 }
 
+#ahp-weights, #min-max-values {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 15px;
+}
+
 #ranking-results {
     margin-top: 20px;
 }
