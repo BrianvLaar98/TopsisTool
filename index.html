@@ -31,6 +31,10 @@
         <button onclick="removeScenario()">Remove Last Scenario</button>
     </div>
 
+    <div class="input-section" id="min-max-values">
+        <!-- Min and Max values for each criterion will be displayed here -->
+    </div>
+
     <div class="input-section">
         <h2>3. AHP Pairwise Comparison</h2>
         <div id="ahp-comparison"></div>
@@ -44,10 +48,25 @@
             <p>9: Extreme importance</p>
             <p>2, 4, 6, 8: Intermediate values</p>
         </div>
+        <div id="ahp-weights">
+            <!-- AHP-derived weights for each criterion will be displayed here -->
+        </div>
     </div>
 
     <div class="input-section">
-        <h2>4. TOPSIS Calculation</h2>
+        <h2>4. Standardized Performance Matrix (TOPSIS)</h2>
+        <table id="standardized-matrix">
+            <thead>
+                <tr id="standardized-headers">
+                    <th>Scenario</th>
+                </tr>
+            </thead>
+            <tbody id="standardized-body"></tbody>
+        </table>
+    </div>
+
+    <div class="input-section">
+        <h2>5. TOPSIS Calculation</h2>
         <button onclick="rankScenarios()">Rank Scenarios</button>
         <div id="ranking-results"></div>
     </div>
