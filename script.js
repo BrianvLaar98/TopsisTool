@@ -101,11 +101,12 @@ function updateAHPMatrix() {
     for (let i = 0; i < criteria.length; i++) {
         for (let j = i + 1; j < criteria.length; j++) {
             const sliderDiv = document.createElement("div");
+            sliderDiv.classList.add("slider-container");
             sliderDiv.innerHTML = `
-                <label>Compare ${criteriaNames[i]?.value || `Criteria ${i + 1}`} with ${criteriaNames[j]?.value || `Criteria ${j + 1}`}: 
-                    <input type="range" min="1" max="9" value="1" step="1" 
-                    onchange="updateAHPValue(${i}, ${j}, this.value)">
-                </label>
+                <div>${criteriaNames[i]?.value || `Criteria ${i + 1}`}</div>
+                <input type="range" min="1" max="9" value="1" step="1" 
+                onchange="updateAHPValue(${i}, ${j}, this.value)">
+                <div>${criteriaNames[j]?.value || `Criteria ${j + 1}`}</div>
             `;
             ahpSection.appendChild(sliderDiv);
         }
@@ -133,6 +134,23 @@ function calculateAHPWeights() {
     return weights;
 }
 
+// Standardize performance values across all criteria
+function standardizePerformance(performanceMatrix) {
+    const means = performanceMatrix[0].map((_, j) =>
+        performanceMatrix.reduce((sum, scenario) => sum + scenario[j], 0) / performanceMatrix.length
+    );
+
+    const stdDevs = performanceMatrix[0].map((_, j) =>
+        Math.sqrt(
+            performanceMatrix.reduce((sum, scenario) => sum + Math.pow(scenario[j] - means[j], 2), 0) / performanceMatrix.length
+        )
+    );
+
+    return performanceMatrix.map(scenario =>
+        scenario.map((value, j) => (value - means[j]) / (stdDevs[j] || 1))
+    );
+}
+
 // Rank scenarios using TOPSIS method
 function rankScenarios() {
     const weights = calculateAHPWeights();
@@ -144,17 +162,11 @@ function rankScenarios() {
         scenario.slice(1).map(input => parseFloat(input.value) || 0)
     );
 
-    // Normalize the matrix
-    const normalizationFactors = performanceMatrix[0].map((_, j) =>
-        Math.sqrt(performanceMatrix.reduce((sum, scenario) => sum + Math.pow(scenario[j], 2), 0))
-    );
+    // Standardize the performance matrix
+    const standardizedMatrix = standardizePerformance(performanceMatrix);
 
-    const normalizedMatrix = performanceMatrix.map(scenario =>
-        scenario.map((value, j) => value / normalizationFactors[j])
-    );
-
-    // Calculate the weighted normalized matrix
-    const weightedMatrix = normalizedMatrix.map(scenario =>
+    // Calculate the weighted standardized matrix
+    const weightedMatrix = standardizedMatrix.map(scenario =>
         scenario.map((value, j) => value * weights[j])
     );
 
