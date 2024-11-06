@@ -1,3 +1,4 @@
+
 let criteria = [];
 let criteriaNames = [];
 let scenarios = [];
@@ -22,17 +23,45 @@ function addCriteria() {
     criteriaHeaders.appendChild(headerCell);
 
     const standardHeaderCell = document.createElement("th");
-    standardHeaderCell.appendChild(document.createTextNode("Standardized " + nameInput.placeholder));
+    standardHeaderCell.appendChild(document.createTextNode("Standardized"));
     standardizedHeaders.appendChild(standardHeaderCell);
 
     const weightedStandardHeaderCell = document.createElement("th");
-    weightedStandardHeaderCell.appendChild(document.createTextNode("Weighted " + nameInput.placeholder));
+    weightedStandardHeaderCell.appendChild(document.createTextNode("Weighted"));
     weightedStandardizedHeaders.appendChild(weightedStandardHeaderCell);
 
     updateAHPMatrix();
 }
 
-// Update AHP matrix with pairwise comparisons
+// Add a new scenario row
+function addScenario() {
+    const scenariosBody = document.getElementById("scenarios-body");
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Scenario Name";
+    nameCell.appendChild(nameInput);
+    row.appendChild(nameCell);
+
+    const scenarioData = [nameInput];
+
+    criteria.forEach(() => {
+        const inputCell = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "number";
+        input.placeholder = "Performance";
+        inputCell.appendChild(input);
+        row.appendChild(inputCell);
+        scenarioData.push(input);
+    });
+
+    scenarios.push(scenarioData);
+    scenariosBody.appendChild(row);
+}
+
+// Update AHP matrix with sliders and horizontal legend
 function updateAHPMatrix() {
     const ahpSection = document.getElementById("ahp-comparison");
     ahpSection.innerHTML = ""; 
@@ -45,8 +74,13 @@ function updateAHPMatrix() {
             sliderDiv.classList.add("slider-container");
             sliderDiv.innerHTML = `
                 <div>${criteriaNames[i].value || `Criteria ${i + 1}`}</div>
-                <input type="range" min="1" max="9" value="1" step="1" 
-                onchange="updateAHPValue(${i}, ${j}, this.value)">
+                <label>
+                    <input type="range" min="1" max="9" value="1" step="1" 
+                    onchange="updateAHPValue(${i}, ${j}, this.value)">
+                    <div class="ahp-scale">
+                        <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span>
+                    </div>
+                </label>
                 <div>${criteriaNames[j].value || `Criteria ${j + 1}`}</div>
             `;
             ahpSection.appendChild(sliderDiv);
@@ -54,7 +88,7 @@ function updateAHPMatrix() {
     }
 }
 
-// Update AHP value based on slider input
+// Update AHP matrix based on slider input
 function updateAHPValue(i, j, value) {
     ahpMatrix[i][j] = parseInt(value);
     ahpMatrix[j][i] = 1 / parseInt(value);
@@ -92,7 +126,7 @@ function standardizePerformance(performanceMatrix) {
     );
 }
 
-// Display weighted standardized matrix and apply AHP weights to standardized values
+// Display weighted standardized matrix and apply AHP weights
 function displayWeightedStandardizedMatrix(standardizedMatrix, weights) {
     const weightedStandardizedBody = document.getElementById("weighted-standardized-body");
     weightedStandardizedBody.innerHTML = "";
