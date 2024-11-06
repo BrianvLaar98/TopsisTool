@@ -1,4 +1,3 @@
-
 let criteria = [];
 let criteriaNames = [];
 let scenarios = [];
