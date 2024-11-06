@@ -8,102 +8,34 @@ function addCriteria() {
     const criteriaSection = document.getElementById("criteria-section");
     const criteriaHeaders = document.getElementById("criteria-headers");
     const standardizedHeaders = document.getElementById("standardized-headers");
-    const scenariosBody = document.getElementById("scenarios-body");
+    const weightedStandardizedHeaders = document.getElementById("weighted-standardized-headers");
 
-    // Create input for criteria name
     const nameInput = document.createElement("input");
     nameInput.type = "text";
     nameInput.placeholder = "Enter Criteria Name";
     criteriaNames.push(nameInput);
     criteria.push(nameInput);
 
-    // Add criteria header cells
+    // Add criteria headers
     const headerCell = document.createElement("th");
     headerCell.appendChild(nameInput);
     criteriaHeaders.appendChild(headerCell);
 
     const standardHeaderCell = document.createElement("th");
-    standardHeaderCell.appendChild(document.createTextNode("Standardized"));
+    standardHeaderCell.appendChild(document.createTextNode("Standardized " + nameInput.placeholder));
     standardizedHeaders.appendChild(standardHeaderCell);
 
-    // Add input cells to each scenario row
-    for (let row of scenariosBody.children) {
-        const inputCell = document.createElement("td");
-        const input = document.createElement("input");
-        input.type = "number";
-        input.placeholder = "Performance";
-        inputCell.appendChild(input);
-        row.appendChild(input);
-        scenarios[row.rowIndex - 1].push(input);
-    }
+    const weightedStandardHeaderCell = document.createElement("th");
+    weightedStandardHeaderCell.appendChild(document.createTextNode("Weighted " + nameInput.placeholder));
+    weightedStandardizedHeaders.appendChild(weightedStandardHeaderCell);
 
     updateAHPMatrix();
 }
 
-// Remove last criteria input field
-function removeCriteria() {
-    if (criteria.length > 0) {
-        const criteriaHeaders = document.getElementById("criteria-headers");
-        const standardizedHeaders = document.getElementById("standardized-headers");
-        const scenariosBody = document.getElementById("scenarios-body");
-
-        // Remove last header and criteria input
-        criteriaHeaders.removeChild(criteriaHeaders.lastChild);
-        standardizedHeaders.removeChild(standardizedHeaders.lastChild);
-        criteria.pop();
-        criteriaNames.pop();
-
-        // Remove last cell in each scenario row
-        for (let row of scenariosBody.children) {
-            row.removeChild(row.lastChild);
-            scenarios[row.rowIndex - 1].pop();
-        }
-
-        updateAHPMatrix();
-    }
-}
-
-// Add a new scenario row
-function addScenario() {
-    const scenariosBody = document.getElementById("scenarios-body");
-    const row = document.createElement("tr");
-
-    const nameCell = document.createElement("td");
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.placeholder = "Scenario Name";
-    nameCell.appendChild(nameInput);
-    row.appendChild(nameCell);
-
-    const scenarioData = [nameInput];
-
-    criteria.forEach(() => {
-        const inputCell = document.createElement("td");
-        const input = document.createElement("input");
-        input.type = "number";
-        input.placeholder = "Performance";
-        inputCell.appendChild(input);
-        row.appendChild(inputCell);
-        scenarioData.push(input);
-    });
-
-    scenarios.push(scenarioData);
-    scenariosBody.appendChild(row);
-}
-
-// Remove last scenario row
-function removeScenario() {
-    if (scenarios.length > 0) {
-        const scenariosBody = document.getElementById("scenarios-body");
-        scenariosBody.removeChild(scenariosBody.lastChild);
-        scenarios.pop();
-    }
-}
-
-// Update the AHP matrix for pairwise comparisons
+// Update AHP matrix with pairwise comparisons
 function updateAHPMatrix() {
     const ahpSection = document.getElementById("ahp-comparison");
-    ahpSection.innerHTML = ""; // Clear existing sliders
+    ahpSection.innerHTML = ""; 
 
     ahpMatrix = Array(criteria.length).fill().map(() => Array(criteria.length).fill(1));
 
@@ -112,22 +44,20 @@ function updateAHPMatrix() {
             const sliderDiv = document.createElement("div");
             sliderDiv.classList.add("slider-container");
             sliderDiv.innerHTML = `
-                <div>${criteriaNames[i]?.value || `Criteria ${i + 1}`}</div>
+                <div>${criteriaNames[i].value || `Criteria ${i + 1}`}</div>
                 <input type="range" min="1" max="9" value="1" step="1" 
                 onchange="updateAHPValue(${i}, ${j}, this.value)">
-                <div>${criteriaNames[j]?.value || `Criteria ${j + 1}`}</div>
+                <div>${criteriaNames[j].value || `Criteria ${j + 1}`}</div>
             `;
             ahpSection.appendChild(sliderDiv);
         }
     }
 }
 
-// Update AHP matrix value based on slider input
+// Update AHP value based on slider input
 function updateAHPValue(i, j, value) {
-    if (ahpMatrix[i] && ahpMatrix[j]) {
-        ahpMatrix[i][j] = parseInt(value);
-        ahpMatrix[j][i] = 1 / parseInt(value);
-    }
+    ahpMatrix[i][j] = parseInt(value);
+    ahpMatrix[j][i] = 1 / parseInt(value);
 }
 
 // Calculate AHP weights and display them
@@ -162,6 +92,27 @@ function standardizePerformance(performanceMatrix) {
     );
 }
 
+// Display weighted standardized matrix and apply AHP weights to standardized values
+function displayWeightedStandardizedMatrix(standardizedMatrix, weights) {
+    const weightedStandardizedBody = document.getElementById("weighted-standardized-body");
+    weightedStandardizedBody.innerHTML = "";
+
+    standardizedMatrix.forEach((scenario, i) => {
+        const row = document.createElement("tr");
+        const scenarioNameCell = document.createElement("td");
+        scenarioNameCell.textContent = scenarios[i][0].value || `Scenario ${i + 1}`;
+        row.appendChild(scenarioNameCell);
+
+        scenario.forEach((value, j) => {
+            const weightedValue = value * weights[j];
+            const cell = document.createElement("td");
+            cell.textContent = weightedValue.toFixed(4);
+            row.appendChild(cell);
+        });
+        weightedStandardizedBody.appendChild(row);
+    });
+}
+
 // Rank scenarios using TOPSIS method
 function rankScenarios() {
     const weights = calculateAHPWeights();
@@ -169,7 +120,6 @@ function rankScenarios() {
         scenario.slice(1).map(input => parseFloat(input.value) || 0)
     );
 
-    // Standardize the performance matrix
     const standardizedMatrix = standardizePerformance(performanceMatrix);
     const standardizedBody = document.getElementById("standardized-body");
     standardizedBody.innerHTML = "";
@@ -187,6 +137,8 @@ function rankScenarios() {
         });
         standardizedBody.appendChild(row);
     });
+
+    displayWeightedStandardizedMatrix(standardizedMatrix, weights);
 
     const weightedMatrix = standardizedMatrix.map(scenario =>
         scenario.map((value, j) => value * weights[j])
